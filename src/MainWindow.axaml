@@ -1,0 +1,319 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ex="using:FsCopilot.Exerciser"
+        x:Class="FsCopilot.Exerciser.MainWindow"
+        Title="FS Copilot Exerciser" Width="1320" Height="880"
+        Background="#121215" FontFamily="Segoe UI">
+
+    <!--
+      One grid, 4 px. Every control is 24 high, every gap is 8, every group is separated by
+      a hairline rather than a floating box, and data is monospaced while labels are not.
+      Status sits in the group it describes: the relay and the app under CONNECTION,
+      the session under SESSION, the counters beside the capture they count.
+    -->
+    <Window.Styles>
+        <Style Selector="TextBlock.group">
+            <Setter Property="Foreground" Value="#6E6E7C"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="#8A8A96"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.value">
+            <Setter Property="Foreground" Value="#E4E4EA"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="Consolas,monospace"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.dim">
+            <Setter Property="Foreground" Value="#6E6E7C"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontFamily" Value="Consolas,monospace"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.prose">
+            <Setter Property="Foreground" Value="#8A8A96"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="LineHeight" Value="16"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="MaxWidth" Value="920"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style Selector="TextBlock.problem">
+            <Setter Property="Foreground" Value="#E08A6A"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style Selector="Border.rule">
+            <Setter Property="Background" Value="#24242A"/>
+            <Setter Property="Height" Value="1"/>
+        </Style>
+        <Style Selector="Border.vrule">
+            <Setter Property="Background" Value="#24242A"/>
+            <Setter Property="Width" Value="1"/>
+        </Style>
+
+        <Style Selector="Button">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Background" Value="#1C1C21"/>
+            <Setter Property="BorderBrush" Value="#2C2C34"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#D8D8E0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#26262E"/>
+            <Setter Property="BorderBrush" Value="#3A3A46"/>
+        </Style>
+        <Style Selector="Button:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="#17171B"/>
+            <Setter Property="Foreground" Value="#55555F"/>
+        </Style>
+
+        <Style Selector="ToggleButton">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Background" Value="#1C1C21"/>
+            <Setter Property="BorderBrush" Value="#2C2C34"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#D8D8E0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="ToggleButton:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3A2A2A"/>
+            <Setter Property="BorderBrush" Value="#7A4A44"/>
+        </Style>
+
+        <Style Selector="ComboBox">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="Consolas,monospace"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Background" Value="#1C1C21"/>
+            <Setter Property="BorderBrush" Value="#2C2C34"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="ComboBoxItem">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="Consolas,monospace"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="8,2"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="Consolas,monospace"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Background" Value="#17171B"/>
+            <Setter Property="BorderBrush" Value="#2C2C34"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="RadioButton">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#C4C4CE"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#2C2C34"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#8A8A96"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <!-- The focus ring is accent-coloured and lands on the tab at startup, which
+                 reads as a decoration nobody asked for. -->
+            <Setter Property="FocusAdorner" Value="{x:Null}"/>
+        </Style>
+        <Style Selector="TabItem:selected">
+            <Setter Property="Foreground" Value="#E4E4EA"/>
+            <Setter Property="BorderBrush" Value="#3E7FA8"/>
+        </Style>
+        <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <!-- Fluent marks the selected tab with an accent pipe. The fill says it here. -->
+        <Style Selector="TabItem /template/ Border#PART_SelectedPipe">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="240,1,*">
+
+        <!-- The shell: connection and session, shared by every feature -->
+        <StackPanel Grid.Column="0" Margin="12">
+
+            <TextBlock Classes="group" Text="BUILD"/>
+            <Grid ColumnDefinitions="56,*" Margin="0,12,0,0">
+                <TextBlock Grid.Column="0" Classes="label" Text="Synced"/>
+                <TextBlock Grid.Column="1" x:Name="SyncState" Classes="value" Text="—"/>
+            </Grid>
+            <Button x:Name="SyncButton" Content="Re-sync FSC source" Click="OnSync"
+                    HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
+            <TextBlock Classes="prose" Margin="0,8,0,0"
+                       Text="Copies your latest FS Copilot build into this tool, then rebuilds the relay and the exerciser against it. The exerciser closes and reopens to load it."/>
+            <TextBlock x:Name="SyncProblem" Classes="problem" IsVisible="False" Margin="0,8,0,0"/>
+
+            <Border Classes="rule" Margin="0,16,0,16"/>
+
+            <TextBlock Classes="group" Text="CONNECTION"/>
+            <Grid ColumnDefinitions="56,*" Margin="0,12,0,0">
+                <TextBlock Grid.Column="0" Classes="label" Text="Relay"/>
+                <ComboBox x:Name="RelayBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="0"
+                          SelectionChanged="OnRelayChanged">
+                    <ComboBoxItem>localhost</ComboBoxItem>
+                    <ComboBoxItem>p2p.fscopilot.com</ComboBoxItem>
+                    <ComboBoxItem>fscrelay.ihsan.dev</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" Margin="0,8,0,0">
+                <TextBlock Grid.Column="0" Classes="label" Text="Status"/>
+                <TextBlock Grid.Column="1" x:Name="RelayState" Classes="value" Text="—"/>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" Margin="0,4,0,0">
+                <TextBlock Grid.Column="0" Classes="label" Text="App"/>
+                <TextBlock Grid.Column="1" x:Name="AppState" Classes="value" Text="—"/>
+            </Grid>
+            <Button x:Name="StartAppButton" Content="Start FS Copilot" Click="OnStartApp"
+                    HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
+            <TextBlock x:Name="ConnectionProblem" Classes="problem" IsVisible="False" Margin="0,8,0,0"/>
+
+            <Border Classes="rule" Margin="0,16,0,16"/>
+
+            <TextBlock Classes="group" Text="SESSION"/>
+            <Grid ColumnDefinitions="56,*,Auto" Margin="0,12,0,0">
+                <TextBlock Grid.Column="0" Classes="label" Text="Code"/>
+                <TextBox x:Name="CodeBox" Grid.Column="1" Watermark="Paste code"/>
+                <Button x:Name="JoinButton" Grid.Column="2" Content="Join" Click="OnJoin" Margin="4,0,0,0"/>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" Margin="0,8,0,0">
+                <TextBlock Grid.Column="0" Classes="label" Text="Status"/>
+                <TextBlock Grid.Column="1" x:Name="SessionState" Classes="value" Text="Not joined"/>
+            </Grid>
+            <Button x:Name="LeaveButton" Content="Leave" Click="OnLeave" HorizontalAlignment="Stretch" Margin="0,12,0,0"
+                    ToolTip.Tip="Leaving is deliberate, which the app tells from an outage."/>
+            <Button x:Name="ControlButton" Content="Take control" Click="OnControl" HorizontalAlignment="Stretch" Margin="0,4,0,0"
+                    ToolTip.Tip="Master is whoever claimed it last, which is the app's own policy."/>
+            <Button x:Name="DegradeButton" Content="Degrade connection" Click="OnDegrade" HorizontalAlignment="Stretch" Margin="0,4,0,0"
+                    ToolTip.Tip="Goes quiet with no goodbye, so the app calls the session degraded."/>
+            <TextBlock x:Name="SessionProblem" Classes="problem" IsVisible="False" Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <Border Grid.Column="1" Classes="vrule"/>
+
+        <!-- The features, and the log under them -->
+        <Grid Grid.Column="2" RowDefinitions="*,1,Auto">
+            <TabControl Grid.Row="0" Padding="0" Margin="12,8,12,0">
+                <TabItem Header="Pointer forwarding">
+                  <Panel>
+                    <TextBlock x:Name="NoSession" Classes="label" HorizontalAlignment="Center"
+                               VerticalAlignment="Center" Text="No session. Join one on the left."/>
+                    <Grid x:Name="PointerPage" RowDefinitions="Auto,Auto,*,Auto,1,Auto" Margin="0,8,0,12">
+
+                        <Grid Grid.Row="0" ColumnDefinitions="72,*" RowDefinitions="Auto,Auto" Margin="0,4,0,12">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Classes="group" Text="EXERCISES" Margin="0,2,0,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Classes="prose"
+                                       Text="This page acts as a second FS Copilot user: it overlays a trace of gestures made on the other peer's side, and sends those made here on the panel below."/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Classes="group" Text="SETUP" Margin="0,10,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Classes="prose" Margin="0,8,0,0"
+                                       Text="Join on the left, pick a panel defined in the profile below, then pop that panel out from MSFS and select it. It appears in the black panel below, and you can interact with it there."/>
+                        </Grid>
+
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto,220,Auto,Auto">
+                            <TextBlock Grid.Column="0" Classes="label" Text="Panel" Margin="0,0,8,0"/>
+                            <ComboBox x:Name="PanelBox" Grid.Column="1" HorizontalAlignment="Stretch"
+                                      SelectionChanged="OnPanelChanged"/>
+                            <TextBlock Grid.Column="2" Classes="label" Text="Window" Margin="16,0,8,0"/>
+                            <ComboBox x:Name="WindowBox" Grid.Column="3" HorizontalAlignment="Stretch"
+                                      SelectionChanged="OnWindowChanged"/>
+                            <Button Grid.Column="4" Content="Refresh" Click="OnRefreshWindows" Margin="4,0,0,0"/>
+                            <Button x:Name="PopOutButton" Grid.Column="5" Content="Pop out" Click="OnPopOut" Margin="4,0,0,0"/>
+                        </Grid>
+
+                        <Border Grid.Row="2" Background="#000000" BorderBrush="#24242A" BorderThickness="1"
+                                CornerRadius="2" Margin="0,8,0,0">
+                            <ex:PanelView x:Name="View"/>
+                        </Border>
+
+                        <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="0,8,0,0">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+                                <Button Content="Fit" Click="OnFit" ToolTip.Tip="The whole window, inside the pane."/>
+                                <Button Content="Fit height" Click="OnFitHeight" ToolTip.Tip="Fill the pane's height; a wide strip then runs off the sides."/>
+                                <Button Content="1:1" Click="OnActualSize" ToolTip.Tip="One captured pixel per screen pixel."/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" x:Name="ZoomText" Classes="dim" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Column="4" x:Name="PanelHint" Classes="dim" Margin="0,0,16,0"/>
+                            <TextBlock Grid.Column="5" x:Name="TrafficText" Classes="dim" Text="Sent 0   Received 0"/>
+                        </Grid>
+
+                        <Border Grid.Row="4" Classes="rule" Margin="0,12,0,0"/>
+
+                        <Grid Grid.Row="5" ColumnDefinitions="Auto,*,Auto" Margin="0,12,0,0">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16">
+                                <TextBlock Classes="group" Text="OVERLAY" VerticalAlignment="Center"/>
+                                <RadioButton x:Name="OverlayNone" GroupName="ov" Content="None" IsChecked="True" Click="OnOverlay" Tag="clear"/>
+                                <RadioButton x:Name="OverlayConnecting" GroupName="ov" Content="Connecting" Click="OnOverlay" Tag="connecting"/>
+                                <RadioButton x:Name="OverlayDegraded" GroupName="ov" Content="Degraded" Click="OnOverlay" Tag="degraded"/>
+                                <RadioButton x:Name="OverlayReplaying" GroupName="ov" Content="Replaying" Click="OnOverlay" Tag="replaying"/>
+                                <RadioButton x:Name="OverlayLost" GroupName="ov" Content="Link lost" Click="OnOverlay" Tag="lost"/>
+                                <Button Content="Force clear" Margin="4,0,0,0" Click="OnForceClear"
+                                        ToolTip.Tip="Removes the overlay even when nothing is renewing the state."/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                <TextBlock Classes="group" Text="GESTURES" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <ToggleButton x:Name="RecordButton" Content="Record" Click="OnRecord"
+                                              ToolTip.Tip="Writes every gesture, both ways, to a file beside the exerciser."/>
+                                <Button x:Name="PlayButton" Content="Replay" Click="OnReplay"
+                                        ToolTip.Tip="Sends the recorded gestures again, at the pace they were made."/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                  </Panel>
+                </TabItem>
+            </TabControl>
+
+            <Border Grid.Row="1" Classes="rule"/>
+
+            <Grid Grid.Row="2" RowDefinitions="Auto,Auto" Margin="12,8,12,12">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto">
+                    <TextBlock Grid.Column="0" Classes="group" Text="LOG" VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Content="Copy" Click="OnCopyLog"/>
+                    <Button Grid.Column="3" Content="Clear" Click="OnClearLog" Margin="4,0,0,0"/>
+                </Grid>
+                <ScrollViewer Grid.Row="1" x:Name="LogScroll" Height="112" Margin="0,8,0,0">
+                    <TextBlock x:Name="LogText" Foreground="#8E9AA2" FontFamily="Consolas,monospace"
+                               FontSize="11" TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

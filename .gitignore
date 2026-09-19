@@ -1,0 +1,10 @@
+bin/
+obj/
+
+# Populated by sync, never committed: these are copies of an FS Copilot build.
+fsc/
+relay/
+
+# Where that build was copied from, and what it was.
+fsc-exerciser.json
+exerciser-log

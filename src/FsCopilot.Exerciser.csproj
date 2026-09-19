@@ -1,0 +1,98 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>FsCopilot.Exerciser</RootNamespace>
+        <AssemblyName>FsCopilot.Exerciser</AssemblyName>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <SelfContained>true</SelfContained>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!-- The app it drives is trimmed and single-file; this is a test tool and neither. -->
+        <PublishTrimmed>false</PublishTrimmed>
+        <!-- No <Platforms>x64</Platforms>: the platform folder it inserts is one more level for
+             anything deriving paths from the assembly to get wrong, and nothing here needs it. -->
+    </PropertyGroup>
+
+    <!-- This tool's own dependencies, free to move independently of FS Copilot's. What both
+         sides genuinely share - System.Reactive, Serilog - is deliberately NOT declared here and
+         comes from the synced build instead: two versions of one assembly in one load context
+         resolve to whichever loaded first, silently. -->
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9" />
+    </ItemGroup>
+
+    <!-- The synced FS Copilot build: referenced to compile against, never copied. Private=false
+         keeps it out of this project's output, so the copy under fsc/ is the only one and the
+         resolver in Fsc.cs serves it and its dependencies from there. -->
+    <ItemGroup>
+        <Reference Include="FsCopilot">
+            <HintPath>..\fsc\FsCopilot.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <!-- Used by this tool's own code as well as FS Copilot's, so taken from the same place
+             for the same reason: one copy of each, and it is the one FS Copilot was built
+             against. A PackageReference here would be a second copy, and the runtime would
+             resolve to whichever loaded first. -->
+        <Reference Include="System.Reactive">
+            <HintPath>..\fsc\System.Reactive.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Serilog">
+            <HintPath>..\fsc\Serilog.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Serilog.Sinks.File">
+            <HintPath>..\fsc\Serilog.Sinks.File.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="**\*.axaml.cs">
+            <DependentUpon>$([System.String]::Copy('%(Filename)').Replace('.axaml',''))</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <!-- Nothing here compiles without a synced build, and the error for a missing HintPath is a
+         wall of unresolved types. Say the one thing that fixes it instead. -->
+    <Target Name="RequireSync" BeforeTargets="BeforeBuild"
+            Condition="!Exists('$(MSBuildProjectDirectory)\..\fsc\FsCopilot.dll')">
+        <Error Text="No FS Copilot build under fsc/. Run: powershell -File sync-and-rebuild.ps1 - it asks which FS Copilot checkout to sync from." />
+    </Target>
+    <!-- MSBuild decides a build is up to date from timestamps, and the one timestamp that
+         matters here lies. sync-and-rebuild.ps1 brings the FS Copilot build in with Copy-Item,
+         which preserves the source's last-write time, so a copy taken from an older checkout
+         lands looking older than the exerciser that was built against the copy before it. The
+         compiler is skipped, the errorlevel guard in run.cmd sees a build that succeeded, and
+         a stale exe starts against an API that has moved - the one failure with no message
+         attached to it.
+
+         Hashing the copy into a generated source file settles it by content instead.
+         WriteOnlyWhenDifferent leaves the file alone when the copy has not changed, so an
+         unchanged sync still builds in a second; when it has changed the file is a Compile
+         input newer than the output, so the compiler runs and says what moved. The same
+         constant is what Sync.Mismatch() compares at startup, for the case no build can
+         catch: fsc/ replaced after this exe was built. -->
+    <Target Name="StampSyncedBuild" BeforeTargets="CoreCompile">
+        <GetFileHash Condition="Exists('$(MSBuildProjectDirectory)\..\fsc\FsCopilot.dll')"
+                     Files="$(MSBuildProjectDirectory)\..\fsc\FsCopilot.dll"
+                     Algorithm="SHA256" HashEncoding="hex">
+            <Output TaskParameter="Hash" PropertyName="SyncedBuildHash" />
+        </GetFileHash>
+        <PropertyGroup>
+            <SyncedBuildStamp>$(IntermediateOutputPath)SyncedBuild.g.cs</SyncedBuildStamp>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(SyncedBuildStamp)" Overwrite="true" WriteOnlyWhenDifferent="true"
+                          Lines="// Generated by the StampSyncedBuild target. Do not edit.;namespace FsCopilot.Exerciser%3B;internal static class SyncedBuild;{;    // The fsc/FsCopilot.dll this build compiled against. Empty when there was none.;    public const string CompiledAgainst = &quot;$(SyncedBuildHash)&quot;%3B;}" />
+        <ItemGroup>
+            <Compile Include="$(SyncedBuildStamp)" />
+        </ItemGroup>
+    </Target>
+
+</Project>

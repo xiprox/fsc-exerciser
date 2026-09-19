@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FsCopilot.Exerciser.App"
+             RequestedThemeVariant="Dark">
+    <Application.Resources>
+        <!-- One accent, calm. Fluent derives its own brushes from these at theme load, which
+             is why they belong here and not on the window. -->
+        <Color x:Key="SystemAccentColor">#3E7FA8</Color>
+        <Color x:Key="SystemAccentColorLight1">#4C93BE</Color>
+        <Color x:Key="SystemAccentColorLight2">#5AA6D2</Color>
+        <Color x:Key="SystemAccentColorLight3">#68B4E0</Color>
+        <Color x:Key="SystemAccentColorDark1">#33688A</Color>
+        <Color x:Key="SystemAccentColorDark2">#2A566F</Color>
+        <Color x:Key="SystemAccentColorDark3">#204457</Color>
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme/>
+    </Application.Styles>
+</Application>
